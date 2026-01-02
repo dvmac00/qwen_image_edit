@@ -11,6 +11,8 @@ import urllib.parse
 import binascii # Base64 에러 처리를 위해 import
 import subprocess
 import time
+import requests
+from io import BytesIO
 
 
 # 로깅 설정
