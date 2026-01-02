@@ -31,7 +31,7 @@ RUN wget -q https://huggingface.co/Comfy-Org/Qwen-Image_ComfyUI/resolve/main/spl
 RUN wget -q https://huggingface.co/Comfy-Org/Qwen-Image_ComfyUI/resolve/main/split_files/vae/qwen_image_vae.safetensors -O /ComfyUI/models/vae/qwen_image_vae.safetensors
 
 # Add Multi-Angle LoRA for angle control:
-RUN wget -q https://huggingface.co/Comfy-Org/Qwen-Image-Edit-Multi-Angle/resolve/main/Qwen-Image-Edit-Multi-Angle.safetensors -O /ComfyUI/models/loras/Qwen-Image-Edit-Multi-Angle.safetensors
+RUN wget -q https://huggingface.co/dx8152/Qwen-Edit-2509-Multiple-angles/resolve/main/Qwen-Edit-2509-Multiple-angles.safetensors -O /ComfyUI/models/loras/Qwen-Edit-2509-Multiple-angles.safetensors
 
 COPY . .
 RUN chmod +x /entrypoint.sh
