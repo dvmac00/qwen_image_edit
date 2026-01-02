@@ -28,14 +28,6 @@
       "strength_model": 1.0
     }
   },
-  "5": {
-    "class_type": "LoraLoader",
-    "inputs": {
-      "model": ["4", 0],
-      "lora_name": "Qwen-Image-Edit-Multi-Angle.safetensors",
-      "strength_model": 1.0
-    }
-  },
   "6": {
     "class_type": "CLIPLoader",
     "inputs": {
