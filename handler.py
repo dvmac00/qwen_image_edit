@@ -238,17 +238,17 @@ def handler(job):
     if image2_path:
         prompt["123"]["inputs"]["image"] = image2_path
 
-# Get angle if specified, otherwise use prompt directly
-angle = job_input.get("angle")
-if angle and angle in ANGLE_PROMPTS:
-    prompt_text = ANGLE_PROMPTS[angle]
-    custom_suffix = job_input.get("prompt", "")
-    if custom_suffix:
-        prompt_text = f"{prompt_text}, {custom_suffix}"
-else:
-    prompt_text = job_input.get("prompt", "")
+    # Get angle if specified, otherwise use prompt directly
+    angle = job_input.get("angle")
+    if angle and angle in ANGLE_PROMPTS:
+        prompt_text = ANGLE_PROMPTS[angle]
+        custom_suffix = job_input.get("prompt", "")
+        if custom_suffix:
+            prompt_text = f"{prompt_text}, {custom_suffix}"
+    else:
+        prompt_text = job_input.get("prompt", "")
 
-prompt["111"]["inputs"]["prompt"] = prompt_text
+    prompt["111"]["inputs"]["prompt"] = prompt_text
 
     prompt["3"]["inputs"]["seed"] = job_input["seed"]
     prompt["128"]["inputs"]["value"] = job_input["width"]
