@@ -14,18 +14,8 @@ import time
 import requests
 from io import BytesIO
 
-# Angle prompt templates for multi-angle generation - body pose focused
-ANGLE_PROMPTS = {
-    "front": "Turn the subject to face directly toward the camera, body and face facing forward, standing straight with arms relaxed at sides",
-    "side_left": "Turn the subject to show their left side profile, body rotated 90 degrees left, face in profile view",
-    "side_right": "Turn the subject to show their right side profile, body rotated 90 degrees right, face in profile view",
-    "three_quarter_left": "Turn the subject to a three-quarter view facing slightly left, body angled 45 degrees, looking toward camera",
-    "three_quarter_right": "Turn the subject to a three-quarter view facing slightly right, body angled 45 degrees, looking toward camera",
-    "back": "Turn the subject to face away from camera, showing their back, head can be slightly turned",
-    "closeup": "Close-up portrait focusing on face and shoulders, subject facing camera",
-    "full_body_front": "Full body shot, subject standing facing camera directly, arms at sides, feet visible",
-    "full_body_back": "Full body shot from behind, subject standing with back to camera, full figure visible"
-}
+# Note: Prompt composition is handled client-side for maximum flexibility.
+# The handler simply passes through whatever prompt is provided.
 
 # 로깅 설정
 logging.basicConfig(level=logging.INFO)
@@ -271,15 +261,8 @@ def handler(job):
     if image2_path:
         prompt["123"]["inputs"]["image"] = image2_path
 
-    # Get angle if specified, otherwise use prompt directly
-    angle = job_input.get("angle")
-    if angle and angle in ANGLE_PROMPTS:
-        prompt_text = ANGLE_PROMPTS[angle]
-        custom_suffix = job_input.get("prompt", "")
-        if custom_suffix:
-            prompt_text = f"{prompt_text}, {custom_suffix}"
-    else:
-        prompt_text = job_input.get("prompt", "")
+    # Use prompt directly - all prompt composition happens client-side
+    prompt_text = job_input.get("prompt", "")
 
     prompt["111"]["inputs"]["prompt"] = prompt_text
 
