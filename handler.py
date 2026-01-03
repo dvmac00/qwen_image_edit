@@ -185,15 +185,34 @@ def download_file_from_url(url, output_path):
         logger.error(f"❌ 다운로드 중 오류 발생: {e}")
         raise Exception(f"다운로드 중 오류 발생: {e}")
 
+def detect_image_format(data):
+    """Detect image format from magic bytes"""
+    if data[:8] == b'\x89PNG\r\n\x1a\n':
+        return 'png'
+    elif data[:2] == b'\xff\xd8':
+        return 'jpg'
+    elif data[:6] in (b'GIF87a', b'GIF89a'):
+        return 'gif'
+    elif data[:4] == b'RIFF' and data[8:12] == b'WEBP':
+        return 'webp'
+    else:
+        return 'png'  # Default to PNG
+
 def save_base64_to_file(base64_data, temp_dir, output_filename):
     """Base64 데이터를 파일로 저장하는 함수"""
     try:
         decoded_data = base64.b64decode(base64_data)
         os.makedirs(temp_dir, exist_ok=True)
+
+        # Detect actual image format and use correct extension
+        img_format = detect_image_format(decoded_data)
+        base_name = os.path.splitext(output_filename)[0]
+        output_filename = f"{base_name}.{img_format}"
+
         file_path = os.path.abspath(os.path.join(temp_dir, output_filename))
         with open(file_path, 'wb') as f:
             f.write(decoded_data)
-        logger.info(f"✅ Base64 입력을 '{file_path}' 파일로 저장했습니다.")
+        logger.info(f"✅ Base64 입력을 '{file_path}' 파일로 저장했습니다. (format: {img_format})")
         return file_path
     except (binascii.Error, ValueError) as e:
         logger.error(f"❌ Base64 디코딩 실패: {e}")
