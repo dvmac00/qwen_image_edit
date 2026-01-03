@@ -14,15 +14,17 @@ import time
 import requests
 from io import BytesIO
 
-# Angle prompt templates for multi-angle generation
+# Angle prompt templates for multi-angle generation - body pose focused
 ANGLE_PROMPTS = {
-    "front": "Move camera to face front, front-facing portrait view",
-    "side_left": "Rotate camera 90 degrees left, left side profile view",
-    "side_right": "Rotate camera 90 degrees right, right side profile view",
-    "three_quarter_left": "Rotate camera 45 degrees left, three-quarter view",
-    "three_quarter_right": "Rotate camera 45 degrees right, three-quarter view",
-    "closeup": "Move camera forward, close-up portrait of face",
-    "top_down": "Move camera above subject looking down, top-down view"
+    "front": "Turn the subject to face directly toward the camera, body and face facing forward, standing straight with arms relaxed at sides",
+    "side_left": "Turn the subject to show their left side profile, body rotated 90 degrees left, face in profile view",
+    "side_right": "Turn the subject to show their right side profile, body rotated 90 degrees right, face in profile view",
+    "three_quarter_left": "Turn the subject to a three-quarter view facing slightly left, body angled 45 degrees, looking toward camera",
+    "three_quarter_right": "Turn the subject to a three-quarter view facing slightly right, body angled 45 degrees, looking toward camera",
+    "back": "Turn the subject to face away from camera, showing their back, head can be slightly turned",
+    "closeup": "Close-up portrait focusing on face and shoulders, subject facing camera",
+    "full_body_front": "Full body shot, subject standing facing camera directly, arms at sides, feet visible",
+    "full_body_back": "Full body shot from behind, subject standing with back to camera, full figure visible"
 }
 
 # 로깅 설정
@@ -198,6 +200,18 @@ def detect_image_format(data):
     else:
         return 'png'  # Default to PNG
 
+def get_image_dimensions(file_path):
+    """Get image dimensions from file using PIL"""
+    try:
+        from PIL import Image
+        with Image.open(file_path) as img:
+            width, height = img.size
+            logger.info(f"📐 Image dimensions: {width}x{height}")
+            return width, height
+    except Exception as e:
+        logger.warning(f"⚠️ Could not get image dimensions: {e}, using defaults")
+        return 720, 1280  # Default dimensions
+
 def save_base64_to_file(base64_data, temp_dir, output_filename):
     """Base64 데이터를 파일로 저장하는 함수"""
     try:
@@ -270,8 +284,22 @@ def handler(job):
     prompt["111"]["inputs"]["prompt"] = prompt_text
 
     prompt["3"]["inputs"]["seed"] = job_input["seed"]
-    prompt["128"]["inputs"]["value"] = job_input["width"]
-    prompt["129"]["inputs"]["value"] = job_input["height"]
+
+    # Use input image dimensions if width/height not specified, or use provided values
+    # This preserves aspect ratio when not explicitly overridden
+    if "width" in job_input and "height" in job_input:
+        output_width = job_input["width"]
+        output_height = job_input["height"]
+    else:
+        # Get dimensions from input image to preserve aspect ratio
+        output_width, output_height = get_image_dimensions(image1_path)
+        # Ensure dimensions are divisible by 8 for model compatibility
+        output_width = (output_width // 8) * 8
+        output_height = (output_height // 8) * 8
+        logger.info(f"📐 Using input image dimensions (adjusted): {output_width}x{output_height}")
+
+    prompt["128"]["inputs"]["value"] = output_width
+    prompt["129"]["inputs"]["value"] = output_height
 
     ws_url = f"ws://{server_address}:8188/ws?clientId={client_id}"
     logger.info(f"Connecting to WebSocket: {ws_url}")
