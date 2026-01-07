@@ -268,6 +268,24 @@ def handler(job):
 
     prompt["3"]["inputs"]["seed"] = job_input["seed"]
 
+      # Optional advanced parameters (Phase 1 & 2 support)
+      # If not provided, workflow defaults are used (steps=4, cfg=1, denoise=1)
+      if "steps" in job_input:
+          prompt["3"]["inputs"]["steps"] = job_input["steps"]
+          logger.info(f"🎛️ Using custom steps: {job_input['steps']}")
+
+      if "cfg" in job_input:
+          prompt["3"]["inputs"]["cfg"] = job_input["cfg"]
+          logger.info(f"🎛️ Using custom CFG scale: {job_input['cfg']}")
+
+      if "denoise" in job_input:
+          prompt["3"]["inputs"]["denoise"] = job_input["denoise"]
+          logger.info(f"🎛️ Using custom denoise strength: {job_input['denoise']}")
+
+      if "negative_prompt" in job_input:
+          prompt["110"]["inputs"]["prompt"] = job_input["negative_prompt"]
+          logger.info(f"🎛️ Using negative prompt: {job_input['negative_prompt'][:50]}...")
+
     # Use input image dimensions if width/height not specified, or use provided values
     # This preserves aspect ratio when not explicitly overridden
     if "width" in job_input and "height" in job_input:
