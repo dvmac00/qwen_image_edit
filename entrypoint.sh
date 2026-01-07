@@ -63,7 +63,10 @@ echo "Using CUDA device: $CUDA_VISIBLE_DEVICES"
 
 # Start ComfyUI in the background
 echo "Starting ComfyUI in the background..."
-python /ComfyUI/main.py --listen --use-sage-attention &
+# Note: --use-sage-attention removed due to incompatibility with Qwen models
+# Causes RuntimeWarning: invalid value encountered in cast -> black images
+# See: https://github.com/comfyanonymous/ComfyUI/issues/9629
+python /ComfyUI/main.py --listen &
 
 # Wait for ComfyUI to be ready
 echo "Waiting for ComfyUI to be ready..."
